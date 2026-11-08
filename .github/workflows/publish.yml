@@ -36,13 +36,13 @@ jobs:
       - name: Check for changes in snippets
         id: verify_changes
         run: |
-          # Check if licenses info have changed
+          # Check if code snippets have changed
           if git diff --quiet snippets/licenses.json; then
             echo "changes_detected=false" >> $GITHUB_OUTPUT
-            echo "Licenses info is up to date."
+            echo "Code snippets are up to date."
           else
             echo "changes_detected=true" >> $GITHUB_OUTPUT
-            echo "Detected licenses info change. Updating the extension..."
+            echo "Detected code snippets change. Updating the extension..."
           fi
 
       - name: Set up Node.js
@@ -61,7 +61,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Bump version and commit changes
+      - name: Commit updated code snippets
+        run: |
+          git add snippets/licenses.json
+          git commit -m "chore: update code snippets"
+
+      - name: Bump version and push changes
         if: steps.verify_changes.outputs.changes_detected == 'true'
         id: version_bump
         run: |
@@ -89,7 +94,7 @@ jobs:
         with:
           tag_name: ${{ steps.version_bump.outputs.version }}
           name: Release ${{ steps.version_bump.outputs.version }}
-          body: "Update code snippets to latest licenses info provided by GitHub API."
+          body: "Update code snippets to match the latest license info provided by GitHub API."
           files: |
             *.vsix
             *.json
