@@ -1,0 +1,1 @@
+This extension provides automatically generated code snippets for LICENSE and LICENSE.md files containing [all commonly used licenses](https://docs.github.com/en/rest/licenses/licenses?apiVersion=2022-11-28#get-all-commonly-used-licenses).

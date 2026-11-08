@@ -1,0 +1,43 @@
+{
+    "categories": [
+        "Snippets",
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "aliases": [
+                    "License File"
+                ],
+                "filenames": [
+                    "LICENSE",
+                    "LICENSE.md",
+                    "LICENSE.txt",
+                    "License",
+                    "License.md",
+                    "License.txt",
+                    "license",
+                    "license.md",
+                    "license.txt"
+                ],
+                "id": "license"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "license",
+                "path": "./snippets/licenses.json"
+            }
+        ]
+    },
+    "description": "Provides code snippets for LICENSE and LICENSE.md files containing all commonly used licenses.",
+    "displayName": "License templates",
+    "engines": {
+        "vscode": "^1.100.0"
+    },
+    "license": "GPL-3.0-only",
+    "name": "license-templates",
+    "publisher": "iineolineii",
+    "repository": "https://github.com/iineolineii/license-templates",
+    "version": "0.0.1"
+}
