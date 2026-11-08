@@ -35,6 +35,7 @@
     "engines": {
         "vscode": "^1.100.0"
     },
+    "icon": "images/marketplace-icon.png",
     "license": "GPL-3.0-only",
     "name": "license-templates",
     "publisher": "iineolineii",
