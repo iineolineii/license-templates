@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-python-version: '3.11'
+          python-version: '3.11'
 
       - name: Install Python dependencies
         run: |
@@ -39,10 +39,10 @@ jobs:
           # Check if code snippets have changed
           if git diff --quiet snippets/licenses.json; then
             echo "changes_detected=false" >> $GITHUB_OUTPUT
-            echo "Code snippets are up to date."
+            echo "✅️ Code snippets are up to date." >> $GITHUB_STEP_SUMMARY
           else
             echo "changes_detected=true" >> $GITHUB_OUTPUT
-            echo "Detected code snippets change. Updating the extension..."
+            echo "🔁 Detected code snippets change. Updating the extension..." >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Set up Node.js
@@ -86,7 +86,7 @@ jobs:
 
       - name: Publish to VS Code Marketplace
         if: steps.verify_changes.outputs.changes_detected == 'true'
-        run: vsce publish --no-dependencies
+        run: vsce publish --oidc --no-dependencies
 
       - name: Create GitHub Release
         if: steps.verify_changes.outputs.changes_detected == 'true'
