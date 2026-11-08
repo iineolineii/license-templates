@@ -97,6 +97,6 @@ jobs:
           body: "Update code snippets to match the latest license info provided by GitHub API."
           files: |
             *.vsix
-            *.json
+            snippets/licenses.json
           draft: false
           prerelease: false
