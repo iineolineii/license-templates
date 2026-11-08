@@ -91,13 +91,13 @@ def fetch_licenses(simple_licenses: Iterable[SimpleLicense]) -> Iterator[License
 
         except JSONDecodeError as exc:
             raise TypeError(
-                f"Invalid license response for {simple_license["name"]!r}. "
+                f"Invalid license response for {simple_license['name']!r}. "
                 f"Failed to parse as JSON: {response.text}."
             ) from exc
 
         if not isinstance(license, dict):
             raise TypeError(
-                f"Invalid license response for {simple_license["name"]!r}. "
+                f"Invalid license response for {simple_license['name']!r}. "
                 f"Expected dictionary, got {type(license)}: {license!r}."
             )
 
