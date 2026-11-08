@@ -1,17 +1,21 @@
 import json
 from collections.abc import Iterable, Iterator
-from typing import Required, TypedDict
+from json import JSONDecodeError
+from typing import NotRequired, TypedDict
 
 import httpx
 
 
-class SimpleLicense(TypedDict, total=False):
-    key:      Required[str]
-    name:     Required[str]
-    url:      Required[str | None]
-    spdx_id:  Required[str | None]
-    node_id:  Required[str]
-    html_url: str
+URL = "https://api.github.com/licenses"
+
+
+class SimpleLicense(TypedDict):
+    key:      str
+    name:     str
+    url:      str
+    spdx_id:  str | None
+    node_id:  str
+    html_url: NotRequired[str]
 
 
 class License(TypedDict):
@@ -48,12 +52,56 @@ def license_snippet(license: License) -> Snippet:
     }
 
 
-def fetch_licenses() -> Iterator[License]:
-    simple_licenses: list[SimpleLicense] = json.loads(httpx.get("https://api.github.com/licenses").text)
+def fetch_simple_licenses(url: str) -> Iterator[SimpleLicense]:
+    response = httpx.get(url)
+    response.raise_for_status()
+
+    try:
+        simple_licenses: list[SimpleLicense] = json.loads(response.text)
+
+    except JSONDecodeError as exc:
+        raise TypeError(
+            f"Invalid simple licenses response. "
+            f"Failed to parse as JSON: {response.text}."
+        ) from exc
+
+    if not isinstance(simple_licenses, list):
+        raise TypeError(
+            f"Invalid simple licenses response. "
+            f"Expected type list, got {type(simple_licenses)}: {simple_licenses!r}."
+        )
+
+    for no, simple_license in enumerate(simple_licenses, start=1):
+        if not isinstance(simple_license, dict):
+            raise TypeError(
+                f"Invalid simple license №{no}. "
+                f"Expected dictionary, got {type(simple_license)}: {simple_license!r}."
+            )
+
+        yield SimpleLicense(**simple_license)
+
+
+def fetch_licenses(simple_licenses: Iterable[SimpleLicense]) -> Iterator[License]:
     for simple_license in simple_licenses:
-        if simple_license["url"] is not None:
-            license: License = json.loads(httpx.get(simple_license["url"]).text)
-            yield license
+        response = httpx.get(simple_license["url"])
+        response.raise_for_status()
+
+        try:
+            license = json.loads(response.text)
+
+        except JSONDecodeError as exc:
+            raise TypeError(
+                f"Invalid license response for {simple_license["name"]!r}. "
+                f"Failed to parse as JSON: {response.text}."
+            ) from exc
+
+        if not isinstance(license, dict):
+            raise TypeError(
+                f"Invalid license response for {simple_license["name"]!r}. "
+                f"Expected dictionary, got {type(license)}: {license!r}."
+            )
+
+        yield License(**license)
 
 
 def get_snippets(licenses: Iterable[License]) -> Iterator[tuple[str, Snippet]]:
@@ -61,6 +109,7 @@ def get_snippets(licenses: Iterable[License]) -> Iterator[tuple[str, Snippet]]:
         yield license["name"], license_snippet(license)
 
 
-licenses = fetch_licenses()
+simple_licenses = fetch_simple_licenses(URL)
+licenses = fetch_licenses(simple_licenses)
 snippets = dict(get_snippets(licenses))
 print(json.dumps(snippets, indent=4))
